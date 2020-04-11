@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+// TODO transfer packege to inner roslibjs files
+<script type="text/javascript" src="http://static.robotwebtools.org/EventEmitter2/current/eventemitter2.js"></script> 
+<script type="text/javascript" src="http://static.robotwebtools.org/roslibjs/current/roslib.min.js"></script>
+
+<script type="text/javascript" type="text/javascript">
+
+  var ros = new ROSLIB.Ros({
+    url : 'ws://localhost:9090'
+  });
+
+  var TurtleBro_actionsClient_movetodistance = new ROSLIB.ActionClient({
+    ros : ros,
+    serverName : '/movetodistance',
+    actionName : '/turtlebro_actions/movetodistanceAction'
+  });
+
+  var TurtleBro_actionsClient_movetime = new ROSLIB.ActionClient({
+    ros : ros,
+    serverName : '/movetime',
+    actionName : '/turtlebro_actions/movetimeAction'
+  });
+
+  var goal_movetodistance = new ROSLIB.Goal({
+    actionClient : TurtleBro_actionsClient_movetodistance,
+    goalMessage : {
+      distance : 0.3,
+      speed : 0.5
+    }
+  });
+
+  var goal_movetime = new ROSLIB.Goal({
+    actionClient : TurtleBro_actionsClient_movetime,
+    goalMessage : {
+      time : 0.8,
+      speed : 0.2
+    }
+  });
+
+  goal_movetodistance.on('feedback', function(feedback) {
+    console.log('Feedback: ' + feedback.distance_passed);
+    var feedback_elem = document.getElementById('feedback');
+    feedback_elem.innerHTML = feedback.distance_passed;
+  });
+
+  goal_movetodistance.on('result', function(result) {
+    console.log('Final Result: ' + result.done);
+    var result_elem = document.getElementById('result');
+    result_elem.innerHTML = result.done;
+  });
+
+  ros.on('connection', function() {
+    console.log('Connected to websocket server.');
+    var elem = document.getElementById('connect');
+    elem.innerHTML = 'Connected';
+  });
+
+  ros.on('error', function(error) {
+    console.log('Error connecting to websocket server: ', error);
+    var elem = document.getElementById('connect');
+    elem.innerHTML = "Error connecting to websocket server";
+  });
+
+  ros.on('close', function() {
+    console.log('Connection to websocket server closed.');
+    var elem = document.getElementById('connect');
+    elem.innerHTML = "Connection to websocket server closed.";
+  });
+
+ goal_movetodistance.send()
+ console.log('goal sent');
+</script>
+</head>
+
+<body>
+  <h1>TurtleBro ActionClient Example</h1>
+  <p>Check the Web Console for output</p>
+  <div id='connect'>"connect"</div>
+  <p></p>
+  <div id='feedback'>"feedback"</div>
+  <p></p>
+  <div id='result'>"result"</div>
+</body>
+</html>

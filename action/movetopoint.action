@@ -1,0 +1,10 @@
+# Define the goal
+float32 X  # Specify X-coords to move
+float32 Y # Specify Y-coords to move
+float32 speed # Specify moving speed
+---
+# Define the result
+bool done #Result ok status
+---
+# Define a feedback message
+float32 distance_passed
